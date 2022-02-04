@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import MarvelService from "../../services/MarvelService";
+import Spinner from "../spinner/Spinner";
 
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
@@ -11,7 +12,8 @@ class RandomChar extends Component {
     }
 
     state = {
-        char: {}
+        char: {},
+        loading: false
     }
 
     marvelService = new MarvelService();
@@ -29,7 +31,14 @@ class RandomChar extends Component {
     }
 
     render() {
-        const {char: {name, description, thumbnail, homepage, wiki}} = this.state;
+        const {char: {name, description, thumbnail, homepage, wiki}, loading} = this.state;
+
+        if (loading) {
+            return (
+                <Spinner/>
+            )
+        }
+
         const descriptionPlaceholder = 'There is no information about this character';
         const fixedDescription = description && description.length > 200 ? description.slice(0, 200) + '...' : descriptionPlaceholder;
 
