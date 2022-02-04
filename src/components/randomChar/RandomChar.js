@@ -30,6 +30,8 @@ class RandomChar extends Component {
 
     render() {
         const {char: {name, description, thumbnail, homepage, wiki}} = this.state;
+        const descriptionPlaceholder = 'There is no information about this character';
+        const fixedDescription = description && description.length > 200 ? description.slice(0, 200) + '...' : descriptionPlaceholder;
 
         return (
             <div className="randomchar">
@@ -38,7 +40,7 @@ class RandomChar extends Component {
                     <div className="randomchar__info">
                         <p className="randomchar__name">{name}</p>
                         <p className="randomchar__descr">
-                            {description}
+                            {fixedDescription}
                         </p>
                         <div className="randomchar__btns">
                             <a href={homepage} className="button button__main">
