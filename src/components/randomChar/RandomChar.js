@@ -10,8 +10,7 @@ class RandomChar extends Component {
     state = {
         char: {},
         loading: true,
-        error: false,
-        imgPlaceholder: false
+        error: false
     }
 
     marvelService = new MarvelService();
@@ -21,7 +20,7 @@ class RandomChar extends Component {
     }
 
     onCharLoaded = (char) => {
-        this.setState({char, loading: false, imgPlaceholder: char.thumbnail.indexOf('image_not_available') > 0});
+        this.setState({char, loading: false});
     }
 
     onError = () => {
@@ -34,21 +33,23 @@ class RandomChar extends Component {
     updateChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
 
+        this.setState({loading: true});
+
         this.marvelService
             .getCharacter(id)
             .then(this.onCharLoaded)
-            .catch()
+            .catch();
     }
 
     render() {
-        const {char, loading, error, imgPlaceholder} = this.state;
+        const {char, loading, error} = this.state;
         const spinner =
-            <div className="randomchar__spinner">
+            <div className="spinner">
                 <Spinner/>
             </div>
         const errorMessage = error ? <ErrorMessage/> : null;
         const spinnerBlock = loading ? spinner : null;
-        const content = !(loading || error) ? <View char={char} imgPlaceholder={imgPlaceholder}/> : null;
+        const content = !(loading || error) ? <View char={char} /> : null;
 
         return (
             <div className="randomchar">
@@ -73,11 +74,11 @@ class RandomChar extends Component {
     }
 }
 
-const View = ({char}, imgPlaceholder) => {
+const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
     const descriptionPlaceholder = 'There is no information about this character';
     const fixedDescription = description && description.length > 200 ? description.slice(0, 200) + '...' : descriptionPlaceholder;
-    const isImgPlaceholder = imgPlaceholder ? 'randomchar__img_placeholder' : '';
+    const isImgPlaceholder = thumbnail.indexOf('image_not_available') > 0 ? 'randomchar__img_placeholder' : '';
 
     return (
         <div className="randomchar__block">
