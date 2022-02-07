@@ -1,17 +1,16 @@
 import './charList.scss';
 import Spinner from "../spinner/Spinner";
 
-const CharList = ({characters}) => {
-    const spinner =
-        <div className="spinner">
-            <Spinner/>
-        </div>
-
+const CharList = ({characters, onCharSelected}) => {
     const chars = !characters ? null :
         characters.map(({thumbnail, name, id}) => {
+            const isImgPlaceholder = thumbnail.indexOf('image_not_available') > 0 ? 'img_placeholder_fill' : '';
             return (
-                <li className="char__item" key={id}>
-                    <img src={thumbnail} alt={name}/>
+                <li
+                    className="char__item"
+                    key={id}
+                    onClick={() => onCharSelected(id)}>
+                    <img src={thumbnail} alt={name} className={isImgPlaceholder}/>
                     <div className="char__name">{name}</div>
                 </li>
             )
@@ -19,7 +18,7 @@ const CharList = ({characters}) => {
 
     return (
         <div className="char__list">
-            {!characters ? spinner : null}
+            {!characters ? <Spinner/> : null}
             <ul className="char__grid">
                 {chars}
                 {/*<li className="char__item char__item_selected">*/}

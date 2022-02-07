@@ -80,3 +80,11 @@ main {
         opacity: 1
     }
 }
+
+.img_placeholder {
+    object-fit: contain !important;
+}
+
+.img_placeholder_fill {
+    object-fit: fill !important;
+}

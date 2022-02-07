@@ -23,6 +23,10 @@ class RandomChar extends Component {
         this.setState({char, loading: false});
     }
 
+    onCharLoading = (char) => {
+        this.setState({char, loading: true});
+    }
+
     onError = () => {
         this.setState({
             loading: false,
@@ -33,7 +37,7 @@ class RandomChar extends Component {
     updateChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
 
-        this.setState({loading: true});
+        this.onCharLoading();
 
         this.marvelService
             .getCharacter(id)
@@ -43,18 +47,15 @@ class RandomChar extends Component {
 
     render() {
         const {char, loading, error} = this.state;
-        const spinner =
-            <div className="spinner">
-                <Spinner/>
-            </div>
+
         const errorMessage = error ? <ErrorMessage/> : null;
-        const spinnerBlock = loading ? spinner : null;
+        const spinner = loading ? <Spinner/> : null;
         const content = !(loading || error) ? <View char={char} /> : null;
 
         return (
             <div className="randomchar">
                 {errorMessage}
-                {spinnerBlock}
+                {spinner}
                 {content}
                 <div className="randomchar__static">
                     <p className="randomchar__title">
@@ -78,7 +79,7 @@ const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
     const descriptionPlaceholder = 'There is no information about this character';
     const fixedDescription = description && description.length > 200 ? description.slice(0, 200) + '...' : descriptionPlaceholder;
-    const isImgPlaceholder = thumbnail.indexOf('image_not_available') > 0 ? 'randomchar__img_placeholder' : '';
+    const isImgPlaceholder = thumbnail.indexOf('image_not_available') > 0 ? 'img_placeholder' : '';
 
     return (
         <div className="randomchar__block">
