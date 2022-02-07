@@ -14,6 +14,9 @@
         width: 180px;
         height: 180px;
         object-fit: cover;
+        &_placeholder {
+            object-fit: contain;
+        }
     }
     &__info {
         display: grid;
@@ -58,5 +61,10 @@
         position: absolute;
         bottom: 14px;
         right: -37px;
+    }
+    &__spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }
