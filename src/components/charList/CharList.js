@@ -1,5 +1,7 @@
 import './charList.scss';
 import Spinner from "../spinner/Spinner";
+import PropTypes from 'prop-types';
+import CharInfo from "../charInfo/CharInfo";
 
 const CharList = ({characters, onCharSelected, charId, newItemsLoading, onRequest, charEnded}) => {
     const chars = !characters ? null :
@@ -33,6 +35,15 @@ const CharList = ({characters, onCharSelected, charId, newItemsLoading, onReques
             </button>
         </div>
     )
+}
+
+CharInfo.propTypes = {
+    charId: PropTypes.number,
+    characters: PropTypes.array,
+    onRequest: PropTypes.func,
+    onCharSelected: PropTypes.func,
+    newItemsLoading: PropTypes.bool,
+    charEnded: PropTypes.bool
 }
 
 export default CharList;
