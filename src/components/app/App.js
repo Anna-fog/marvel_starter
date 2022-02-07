@@ -8,11 +8,18 @@ import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 import decoration from '../../resources/img/vision.png';
 
+
 class App extends Component {
     state = {
         characters: [],
-        selectedChar: null
+        selectedChar: null,
+        newItemsLoading: false,
+        offset: 210,
+        charEnded: false
+
     }
+
+    marvelService = new MarvelService();
 
     onCharSelected = (id) => {
         this.setState({
@@ -20,14 +27,40 @@ class App extends Component {
         });
     }
 
-    async componentDidMount() {
-        await this.getCharacters();
+    onCharListLoading = () => {
+        this.setState({
+            newItemsLoading: true
+        })
     }
 
-    getCharacters = async () => {
-        const marvelService = new MarvelService();
-        const characters = await marvelService.getAllCharacters();
-        this.setState({characters});
+    onCharListLoaded = (newCharacters) => {
+        let ended = false;
+        if (newCharacters.length < 9) {
+            ended = true;
+        }
+        this.setState(({characters}) => ({
+            characters: [...characters, ...newCharacters],
+            newItemsLoading: false,
+            charEnded: ended
+        }))
+    }
+
+    onError = (e) => {
+        console.log(e)
+    }
+
+    async componentDidMount() {
+        this.onRequest();
+    }
+
+    onRequest = () => {
+        this.onCharListLoading();
+        this.setState({offset: this.state.offset + 9});
+
+        this.marvelService
+            .getAllCharacters(this.state.offset)
+            .then(this.onCharListLoaded)
+            .catch(this.onError);
     }
 
     render () {
@@ -41,7 +74,14 @@ class App extends Component {
                     </ErrorBoundary>
                     <div className="char__content">
                         <ErrorBoundary>
-                            <CharList characters={characters} onCharSelected={this.onCharSelected}/>
+                            <CharList
+                                charId={this.state.selectedChar}
+                                charEnded={this.state.charEnded}
+                                characters={characters}
+                                onCharSelected={this.onCharSelected}
+                                newItemsLoading={this.state.newItemsLoading}
+                                onRequest={this.onRequest}
+                            />
                         </ErrorBoundary>
                         <ErrorBoundary>
                             <CharInfo charId={this.state.selectedChar}/>
