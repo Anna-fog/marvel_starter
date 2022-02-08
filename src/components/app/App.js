@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import AppHeader from "../appHeader/AppHeader";
 import RandomChar from "../randomChar/RandomChar";
 import CharList from "../charList/CharList";
@@ -9,89 +9,80 @@ import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 import decoration from '../../resources/img/vision.png';
 
 
-class App extends Component {
-    state = {
-        characters: [],
-        selectedChar: null,
-        newItemsLoading: false,
-        offset: 210,
-        charEnded: false
+const App = () => {
+    const [characters, setCharacters] = useState([]);
+    const [selectedChar, setChar] = useState(null);
+    const [newItemsLoading, setNewItemsLoading] = useState(false);
+    const [offset, setOffset] = useState(210);
+    const [charEnded, setCharEnded] = useState(false);
 
+    const marvelService = new MarvelService();
+
+    useEffect(() => {
+        onRequest();
+    }, []);
+
+    const onCharSelected = (id) => {
+       setChar(id);
     }
 
-    marvelService = new MarvelService();
-
-    onCharSelected = (id) => {
-        this.setState({
-            selectedChar: id
-        });
+    const onCharListLoading = () => {
+        setNewItemsLoading(true);
     }
 
-    onCharListLoading = () => {
-        this.setState({
-            newItemsLoading: true
-        })
-    }
-
-    onCharListLoaded = (newCharacters) => {
+    const onCharListLoaded = (newCharacters) => {
         let ended = false;
         if (newCharacters.length < 9) {
             ended = true;
         }
-        this.setState(({characters}) => ({
-            characters: [...characters, ...newCharacters],
-            newItemsLoading: false,
-            charEnded: ended
-        }))
+        setCharacters(characters => [...characters, ...newCharacters]);
+        setNewItemsLoading(false);
+        setCharEnded(ended);
     }
 
-    onError = (e) => {
-        console.log(e)
+    const onError = (e) => {
+        console.log(e);
+        setNewItemsLoading(false);
     }
 
-    async componentDidMount() {
-        this.onRequest();
+    const onRequest = () => {
+        onCharListLoading();
+        setOffset(offset => offset + 9);
+
+        marvelService
+            .getAllCharacters(offset)
+            .then(onCharListLoaded)
+            .catch(onError);
     }
 
-    onRequest = () => {
-        this.onCharListLoading();
-        this.setState({offset: this.state.offset + 9});
+    const chars = characters.length ? characters : null;
 
-        this.marvelService
-            .getAllCharacters(this.state.offset)
-            .then(this.onCharListLoaded)
-            .catch(this.onError);
-    }
-
-    render () {
-        const characters = this.state.characters.length ? this.state.characters : null;
-        return (
-            <div className="app">
-                <AppHeader/>
-                <main>
+    return (
+        <div className="app">
+            <AppHeader/>
+            <main>
+                <ErrorBoundary>
+                    <RandomChar/>
+                </ErrorBoundary>
+                <div className="char__content">
                     <ErrorBoundary>
-                        <RandomChar/>
+                        <CharList
+                            charId={selectedChar}
+                            charEnded={charEnded}
+                            characters={chars}
+                            onCharSelected={onCharSelected}
+                            newItemsLoading={newItemsLoading}
+                            onRequest={onRequest}
+                        />
                     </ErrorBoundary>
-                    <div className="char__content">
-                        <ErrorBoundary>
-                            <CharList
-                                charId={this.state.selectedChar}
-                                charEnded={this.state.charEnded}
-                                characters={characters}
-                                onCharSelected={this.onCharSelected}
-                                newItemsLoading={this.state.newItemsLoading}
-                                onRequest={this.onRequest}
-                            />
-                        </ErrorBoundary>
-                        <ErrorBoundary>
-                            <CharInfo charId={this.state.selectedChar}/>
-                        </ErrorBoundary>
-                    </div>
-                    <img className="bg-decoration" src={decoration} alt="vision"/>
-                </main>
-            </div>
-        )
-    }
+                    <ErrorBoundary>
+                        <CharInfo charId={selectedChar}/>
+                    </ErrorBoundary>
+                </div>
+                <img className="bg-decoration" src={decoration} alt="vision"/>
+            </main>
+        </div>
+    )
 }
 
 export default App;
