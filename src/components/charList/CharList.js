@@ -8,11 +8,19 @@ const CharList = ({characters, onCharSelected, charId, newItemsLoading, onReques
         characters.map(({thumbnail, name, id}) => {
             const isImgPlaceholder = thumbnail.indexOf('image_not_available') > 0 ? 'img_placeholder_fill' : '';
             const activeChar = charId === id ? 'char__item_selected' : '';
+            const onCharEnter = (e, id) => {
+                if (e.key === ' ' || e.key === "Enter") {
+                    onCharSelected(id);
+                }
+            }
             return (
                 <li
                     className= {`char__item ${activeChar}`}
                     key={id}
-                    onClick={() => onCharSelected(id)}>
+                    tabIndex={0}
+                    onClick={() => onCharSelected(id)}
+                    onKeyPress={(e) => onCharEnter(e, id)}
+                >
                     <img src={thumbnail} alt={name} className={isImgPlaceholder}/>
                     <div className="char__name">{name}</div>
                 </li>
