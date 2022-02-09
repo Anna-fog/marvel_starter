@@ -2,18 +2,45 @@ import './charList.scss';
 import Spinner from "../spinner/Spinner";
 import PropTypes from 'prop-types';
 import CharInfo from "../charInfo/CharInfo";
-import {useEffect} from 'react';
+import useMarvelService from "../../services/MarvelService";
+import {useEffect, useState} from 'react';
 
-const CharList = ({characters, onCharSelected, charId, newItemsLoading, onRequest, charEnded}) => {
+const CharList = ({onCharSelected, charId}) => {
+    const {getAllCharacters, loading} = useMarvelService();
+    const [characters, setCharacters] = useState([]);
+    const [offset, setOffset] = useState(210);
+    const [charEnded, setCharEnded] = useState(false);
+    const [newItemsLoading, setNewItemsLoading] = useState(false);
+
+    useEffect(() => {
+        onRequest(true);
+    }, []);
+
+    useEffect(() => {
+        return chars;
+    }, [])
+
+    const onRequest = (initial) => {
+        initial ? setNewItemsLoading(false) : setNewItemsLoading(true);
+        setOffset(offset => offset + 9);
+
+        getAllCharacters(offset).then(onCharListLoaded)
+    }
+
+    const onCharListLoaded = (newCharacters) => {
+        let ended = false;
+        if (newCharacters.length < 9) {
+            ended = true;
+        }
+        setCharacters(characters => [...characters, ...newCharacters]);
+        setCharEnded(ended);
+        setNewItemsLoading(false);
+    }
 
     const chars = !characters ? null :
         characters.map(({thumbnail, name, id}) => {
             return renderItem(thumbnail, name, id);
     });
-
-    useEffect(() => {
-        return chars;
-    }, [])
 
     function renderItem(thumbnail, name, id) {
         const isImgPlaceholder = thumbnail.indexOf('image_not_available') > 0 ? 'img_placeholder_fill' : '';
@@ -57,11 +84,11 @@ const CharList = ({characters, onCharSelected, charId, newItemsLoading, onReques
 
 CharInfo.propTypes = {
     charId: PropTypes.number,
-    characters: PropTypes.array,
-    onRequest: PropTypes.func,
     onCharSelected: PropTypes.func,
-    newItemsLoading: PropTypes.bool,
-    charEnded: PropTypes.bool
+    // characters: PropTypes.array,
+    // onRequest: PropTypes.func,
+    // newItemsLoading: PropTypes.bool,
+    // charEnded: PropTypes.bool
 }
 
 export default CharList;
