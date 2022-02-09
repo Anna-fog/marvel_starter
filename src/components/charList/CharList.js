@@ -15,7 +15,7 @@ const CharList = ({characters, onCharSelected, charId, newItemsLoading, onReques
         return chars;
     }, [])
 
-    function renderItem (thumbnail, name, id) {
+    function renderItem(thumbnail, name, id) {
         const isImgPlaceholder = thumbnail.indexOf('image_not_available') > 0 ? 'img_placeholder_fill' : '';
         const activeChar = charId === id ? 'char__item_selected' : '';
         const onCharEnter = (e, id) => {
