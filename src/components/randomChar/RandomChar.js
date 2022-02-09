@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/errorMessage";
 
@@ -8,10 +8,8 @@ import mjolnir from '../../resources/img/mjolnir.png';
 
 const RandomChar = () => {
     const [char, setChar] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
 
-    const marvelService = new MarvelService();
+    const {loading, error, getCharacter, clearError} = useMarvelService();
 
     useEffect(() => {
         updateChar();
@@ -19,28 +17,13 @@ const RandomChar = () => {
 
     const onCharLoaded = (char) => {
         setChar(char);
-        setLoading(false);
-    }
-
-    const onCharLoading = (char) => {
-        setChar(char);
-        setLoading(true);
-    }
-
-    const onError = () => {
-        setError(true);
-        setLoading(false);
     }
 
     const updateChar = () => {
+        clearError();
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
 
-        onCharLoading();
-
-        marvelService
-            .getCharacter(id)
-            .then(onCharLoaded)
-            .catch(onError);
+        getCharacter(id).then(onCharLoaded)
     }
 
     const errorMessage = error ? <ErrorMessage/> : null;
@@ -73,7 +56,7 @@ const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
     const descriptionPlaceholder = 'There is no information about this character';
     const fixedDescription = description && description.length > 200 ? description.slice(0, 200) + '...' : descriptionPlaceholder;
-    const isImgPlaceholder = thumbnail.indexOf('image_not_available') > 0 ? 'img_placeholder' : '';
+    const isImgPlaceholder = thumbnail && thumbnail.indexOf('image_not_available') > 0 ? 'img_placeholder' : '';
 
     return (
         <div className="randomchar__block">

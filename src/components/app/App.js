@@ -3,7 +3,7 @@ import AppHeader from "../appHeader/AppHeader";
 import RandomChar from "../randomChar/RandomChar";
 import CharList from "../charList/CharList";
 import CharInfo from "../charInfo/CharInfo";
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 import decoration from '../../resources/img/vision.png';
@@ -12,22 +12,18 @@ import decoration from '../../resources/img/vision.png';
 const App = () => {
     const [characters, setCharacters] = useState([]);
     const [selectedChar, setChar] = useState(null);
-    const [newItemsLoading, setNewItemsLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
+    const [newItemsLoading, setNewItemsLoading] = useState(false);
 
-    const marvelService = new MarvelService();
+    const {getAllCharacters, loading} = useMarvelService();
 
     useEffect(() => {
-        onRequest();
+        onRequest(true);
     }, []);
 
     const onCharSelected = (id) => {
        setChar(id);
-    }
-
-    const onCharListLoading = () => {
-        setNewItemsLoading(true);
     }
 
     const onCharListLoaded = (newCharacters) => {
@@ -36,23 +32,15 @@ const App = () => {
             ended = true;
         }
         setCharacters(characters => [...characters, ...newCharacters]);
-        setNewItemsLoading(false);
         setCharEnded(ended);
-    }
-
-    const onError = (e) => {
-        console.log(e);
         setNewItemsLoading(false);
     }
 
-    const onRequest = () => {
-        onCharListLoading();
+    const onRequest = (initial) => {
+        initial ? setNewItemsLoading(false) : setNewItemsLoading(true);
         setOffset(offset => offset + 9);
 
-        marvelService
-            .getAllCharacters(offset)
-            .then(onCharListLoaded)
-            .catch(onError);
+        getAllCharacters(offset).then(onCharListLoaded)
     }
 
     const chars = characters.length ? characters : null;
