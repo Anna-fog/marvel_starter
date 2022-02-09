@@ -1,39 +1,71 @@
 import './comicsList.scss';
+import {Link} from "react-router-dom";
 import { useState, useEffect } from 'react';
 import useMarvelService from "../../services/MarvelService";
+import Spinner from "../spinner/Spinner";
 
 const ComicsList = () => {
     const [comics, setComics] = useState([]);
+    const [offset, setOffset] = useState(10);
+    const [comicsEnded, setComicsEnded] = useState(false);
+    const [newItemsLoading, setNewItemsLoading] = useState(false);
+
     const {getAllComics} = useMarvelService();
 
     useEffect(() => {
-        getAllComics().then(res => setComics(res.data.results));
+        onRequest(offset, true)
     }, []);
 
-    const comicsListItem = !comics.length ? null : comics.map(item =>  renderComics(item));
+    const onRequest = (offset, initial) => {
+        initial ? setNewItemsLoading(false) : setNewItemsLoading(true);
+        setOffset(offset => offset + 9);
+        getAllComics(offset).then(onComicsListLoaded)
+    }
 
-    function renderComics(item) {
+    const onComicsListLoaded = (newComics) => {
+        let ended = false;
+        if (newComics.length < 9) {
+            ended = true;
+        }
+        setComics(comics => [...comics, ...newComics.data.results]);
+        setComicsEnded(ended);
+        setNewItemsLoading(false);
+    }
+
+    const comicsListItem = !comics.length ? null : comics.map((item, i) => renderComics(item, i));
+
+    function renderComics(item, i) {
         const {id, title, thumbnail, prices} = item;
         const price = <div className="comics__item-price">{prices[0].price}$</div>
 
         return (
-            <li className="comics__item" key={id}>
-                <a href="#">
+            <li className="comics__item" key={i}>
+                <Link to={`/comics/${item.id}`}>
                     <img src={`${thumbnail.path}.${thumbnail.extension}`} alt={title} className="comics__item-img"/>
                     <div className="comics__item-name">{title}</div>
                     {prices[0].price > 0 ? price : null }
-                </a>
+                </Link>
             </li>
         )
     }
 
     return (
         <div className="comics__list">
+            {!comicsListItem || newItemsLoading? <Spinner/> : null}
             <ul className="comics__grid">
                 {comicsListItem}
             </ul>
-            <button className="button button__main button__long">
-                <div className="inner">load more</div>
+            <button
+                className="button button__main button__long"
+                disabled={newItemsLoading}
+                style={{'display': comicsEnded ? 'none' : 'block'}}
+            >
+                <div
+                    className="inner"
+                    onClick={onRequest}
+                >
+                    load more
+                </div>
             </button>
         </div>
     )
