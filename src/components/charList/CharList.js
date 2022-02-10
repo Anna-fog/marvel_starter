@@ -4,9 +4,10 @@ import PropTypes from 'prop-types';
 import CharInfo from "../charInfo/CharInfo";
 import useMarvelService from "../../services/MarvelService";
 import {useEffect, useState} from 'react';
+import {CSSTransition, TransitionGroup} from 'react-transition-group';
 
 const CharList = ({onCharSelected, charId}) => {
-    const {getAllCharacters, loading} = useMarvelService();
+    const {getAllCharacters} = useMarvelService();
     const [characters, setCharacters] = useState([]);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
@@ -38,11 +39,11 @@ const CharList = ({onCharSelected, charId}) => {
     }
 
     const chars = !characters ? null :
-        characters.map(({thumbnail, name, id}) => {
-            return renderItem(thumbnail, name, id);
+        characters.map((res) => {
+            return renderItem(res);
     });
 
-    function renderItem(thumbnail, name, id) {
+    function renderItem({thumbnail, name, id}) {
         const isImgPlaceholder = thumbnail.indexOf('image_not_available') > 0 ? 'img_placeholder_fill' : '';
         const activeChar = charId === id ? 'char__item_selected' : '';
         const onCharEnter = (e, id) => {
@@ -51,25 +52,27 @@ const CharList = ({onCharSelected, charId}) => {
             }
         }
         return (
-            <li
-                className= {`char__item ${activeChar}`}
-                key={id}
-                tabIndex={0}
-                onClick={() => onCharSelected(id)}
-                onKeyPress={(e) => onCharEnter(e, id)}
-            >
-                <img src={thumbnail} alt={name} className={isImgPlaceholder}/>
-                <div className="char__name">{name}</div>
-            </li>
+            <CSSTransition classNames="item" timeout={500} key={id}>
+                <li
+                    className= {`char__item ${activeChar}`}
+                    key={id}
+                    tabIndex={0}
+                    onClick={() => onCharSelected(id)}
+                    onKeyPress={(e) => onCharEnter(e, id)}
+                >
+                    <img src={thumbnail} alt={name} className={isImgPlaceholder}/>
+                    <div className="char__name">{name}</div>
+                </li>
+            </CSSTransition>
         )
     }
 
     return (
         <div className="char__list">
             {!characters || newItemsLoading ? <Spinner/> : null}
-            <ul className="char__grid">
+            <TransitionGroup className="char__grid">
                 {chars}
-            </ul>
+            </TransitionGroup>
             <button
                 className="button button__main button__long"
                 disabled={newItemsLoading}
@@ -85,10 +88,6 @@ const CharList = ({onCharSelected, charId}) => {
 CharInfo.propTypes = {
     charId: PropTypes.number,
     onCharSelected: PropTypes.func,
-    // characters: PropTypes.array,
-    // onRequest: PropTypes.func,
-    // newItemsLoading: PropTypes.bool,
-    // charEnded: PropTypes.bool
 }
 
 export default CharList;
