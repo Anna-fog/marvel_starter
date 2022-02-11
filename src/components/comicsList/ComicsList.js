@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import { useState, useEffect } from 'react';
 import useMarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
+import {CSSTransition, TransitionGroup} from 'react-transition-group';
 
 const ComicsList = () => {
     const [comics, setComics] = useState([]);
@@ -39,22 +40,24 @@ const ComicsList = () => {
         const price = <div className="comics__item-price">{prices[0].price}$</div>
 
         return (
-            <li className="comics__item" key={i}>
-                <Link to={`/comics/${item.id}`}>
-                    <img src={`${thumbnail.path}.${thumbnail.extension}`} alt={title} className="comics__item-img"/>
-                    <div className="comics__item-name">{title}</div>
-                    {prices[0].price > 0 ? price : null }
-                </Link>
-            </li>
+            <CSSTransition classNames="item" timeout={500} key={id}>
+                <li className="comics__item" key={i}>
+                    <Link to={`/comics/${item.id}`}>
+                        <img src={`${thumbnail.path}.${thumbnail.extension}`} alt={title} className="comics__item-img"/>
+                        <div className="comics__item-name">{title}</div>
+                        {prices[0].price > 0 ? price : null }
+                    </Link>
+                </li>
+            </CSSTransition>
         )
     }
 
     return (
         <div className="comics__list">
             {!comicsListItem || newItemsLoading? <Spinner/> : null}
-            <ul className="comics__grid">
+            <TransitionGroup className="comics__grid">
                 {comicsListItem}
-            </ul>
+            </TransitionGroup>
             <button
                 className="button button__main button__long"
                 disabled={newItemsLoading}

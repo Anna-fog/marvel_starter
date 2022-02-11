@@ -69,7 +69,7 @@ const CharList = ({onCharSelected, charId}) => {
 
     return (
         <div className="char__list">
-            {!characters || newItemsLoading ? <Spinner/> : null}
+            {!characters.length || newItemsLoading ? <Spinner/> : null}
             <TransitionGroup className="char__grid">
                 {chars}
             </TransitionGroup>
