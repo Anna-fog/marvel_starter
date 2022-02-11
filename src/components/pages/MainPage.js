@@ -1,6 +1,7 @@
 import RandomChar from "../randomChar/RandomChar";
 import CharList from "../charList/CharList";
 import CharInfo from "../charInfo/CharInfo";
+import SearchForm from "../searchForm/SearchForm";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 import {useState} from "react";
 
@@ -11,6 +12,19 @@ const MainPage = () => {
 
     const onCharSelected = (id) => {
         setChar(id);
+    }
+
+    const AsideWrapper = () => {
+        return (
+            <div className="aside-wrapper">
+                <ErrorBoundary>
+                    <CharInfo charId={selectedChar}/>
+                </ErrorBoundary>
+                <ErrorBoundary>
+                    <SearchForm/>
+                </ErrorBoundary>
+            </div>
+        )
     }
 
     return (
@@ -25,9 +39,7 @@ const MainPage = () => {
                         onCharSelected={onCharSelected}
                     />
                 </ErrorBoundary>
-                <ErrorBoundary>
-                    <CharInfo charId={selectedChar}/>
-                </ErrorBoundary>
+                <AsideWrapper/>
             </div>
             <img className="bg-decoration" src={decoration} alt="vision"/>
         </>
