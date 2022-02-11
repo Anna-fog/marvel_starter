@@ -3,7 +3,7 @@ import Spinner from "../spinner/Spinner";
 import PropTypes from 'prop-types';
 import CharInfo from "../charInfo/CharInfo";
 import useMarvelService from "../../services/MarvelService";
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useMemo} from 'react';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 
 const CharList = ({onCharSelected, charId}) => {
@@ -70,7 +70,7 @@ const CharList = ({onCharSelected, charId}) => {
     return (
         <div className="char__list">
             {!characters.length || newItemsLoading ? <Spinner/> : null}
-            <TransitionGroup className="char__grid">
+            <TransitionGroup component='ul' className="char__grid">
                 {chars}
             </TransitionGroup>
             <button

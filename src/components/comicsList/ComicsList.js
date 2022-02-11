@@ -55,7 +55,7 @@ const ComicsList = () => {
     return (
         <div className="comics__list">
             {!comicsListItem || newItemsLoading? <Spinner/> : null}
-            <TransitionGroup className="comics__grid">
+            <TransitionGroup component='ul' className="comics__grid">
                 {comicsListItem}
             </TransitionGroup>
             <button
