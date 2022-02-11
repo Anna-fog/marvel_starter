@@ -5,6 +5,7 @@ import MarvelService from "../../services/MarvelService";
 import { useState, useEffect } from 'react';
 import ErrorMessage from "../errorMessage/errorMessage";
 import Spinner from "../spinner/Spinner";
+import {Helmet} from "react-helmet";
 
 const CharacterPage = () => {
     const {charId} = useParams();
@@ -39,16 +40,23 @@ const CharacterPage = () => {
 }
 
 const View = ({char}) => {
-    const {title, description, thumbnail} = char;
+    const {name, description, thumbnail} = char;
     const descrPlaceholder = 'There is no description for this character'
 
     return (
         <>
+            <Helmet>
+                <meta
+                    name="description"
+                    content={`${name} character`}
+                />
+                <title>{name}</title>
+            </Helmet>
             <AppBanner/>
             <div className="single-char">
-                <img src={thumbnail} alt={title} className="single-char__img"/>
+                <img src={thumbnail} alt={name} className="single-char__img"/>
                 <div className="single-char__info">
-                    <h2 className="single-char__name">{title}</h2>
+                    <h2 className="single-char__name">{name}</h2>
                     <p className="single-char__descr">
                         {description ? description : descrPlaceholder}
                     </p>
